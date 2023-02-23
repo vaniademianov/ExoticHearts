@@ -1,0 +1,12 @@
+name: ExoHearts
+version: '${project.version}'
+main: net.remote.access.exohearts.ExoHearts
+api-version: 1.19
+prefix:  EH
+load: STARTUP
+authors: [ RemoteAccess ]
+description: Плагін зроблений спеціально для ExoticCraft RemoteAccess01
+website: exoticcraft.fun
+commands:
+  vers:
+    description: Версія плагіну
