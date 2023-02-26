@@ -17,3 +17,5 @@ commands:
     description: Екіпірувати серце в руці
   unequip:
     description: unequip <номер> Розекіпірувати серце
+  texturepack:
+    description: завантажити текстурпак

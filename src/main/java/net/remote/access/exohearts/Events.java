@@ -41,7 +41,7 @@ public class Events implements Listener {
 //        e.getPlayer().sendMessage("Ви порухалися");
 //    }
     public void OnPLayerJoin(PlayerJoinEvent e) {
-        e.getPlayer().setTexturePack("https://www.dropbox.com/s/o86pw6fmvymuywp/ExoticPack2.zip?dl=1");
+        e.getPlayer().setTexturePack("https://www.dropbox.com/s/9qv9im0893vzl93/exoticpack3.zip?dl=1");
         ItemStack dye = new ItemStack(Material.LIGHT_GRAY_DYE);
         ItemMeta meta = dye.getItemMeta();
         meta.setDisplayName("§f§4§lТут може бути ваше сердечко <3");

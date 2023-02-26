@@ -89,6 +89,13 @@ public final class ExoHearts extends JavaPlugin {
                 return false;
             }
         });
+        getCommand("texturepack").setExecutor(new CommandExecutor() {
+            @Override
+            public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                Bukkit.getPlayer(sender.getName()).setTexturePack("https://www.dropbox.com/s/9qv9im0893vzl93/exoticpack3.zip?dl=1");
+                return true;
+            }
+        });
         getCommand("unequip").setExecutor(new CommandExecutor() {
             @Override
             public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
