@@ -1,13 +1,22 @@
 package net.remote.access.exohearts;
 
+import de.tr7zw.nbtapi.NBTItem;
+import net.remote.access.exohearts.items.DefaultItem;
+import net.remote.access.exohearts.items.LapisHeart;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.logging.Logger;
 //Лазуритове Серце
 //        В 1.5 Більше досвіду
@@ -51,13 +60,84 @@ public final class ExoHearts extends JavaPlugin {
         getCommand("vers").setExecutor(new CommandExecutor() {
             @Override
             public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                sender.sendMessage("Версія плагіну: 0.0.3 DEV BUILD");
+                sender.sendMessage("Версія плагіну: 0.0.4 DEV BUILD");
                 return true;
             }
         });
         Listener lst = new Events();
         org.bukkit.Bukkit.getServer().getPluginManager().registerEvents(lst, this);
+        getCommand("equip").setExecutor(new CommandExecutor() {
+            @Override
+            public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                NBTItem nbt;
 
+                Player p = Bukkit.getPlayer(sender.getName());
+                if (p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR) {
+                NBTItem hand = new NBTItem(p.getItemInHand());
+
+                    for (int i = 9; i < 18; i++) {
+                        nbt = new NBTItem(p.getInventory().getItem(i));
+
+                        if (!nbt.getBoolean("is_heart") && hand.getBoolean("is_heart")) {
+                            p.getInventory().setItem(i, p.getItemInHand());
+                            p.getInventory().setItemInHand(new ItemStack(Material.AIR));
+                            return true;
+                        }
+                    }
+                }
+                sender.sendMessage("Дія не вдалася, оскільки інвентар сердець повний та/або у вас в руці не серце");
+                return false;
+            }
+        });
+        getCommand("unequip").setExecutor(new CommandExecutor() {
+            @Override
+            public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                if (args.length == 0) {
+                    sender.sendMessage("Правильне використання команди: unequip <номер слоту від 1 до 9>");
+                    return false;
+                }
+                Player p = Bukkit.getPlayer(sender.getName());
+                ItemStack it = p.getInventory().getItem(8+Integer.parseInt(args[0]));
+                NBTItem nb = new NBTItem(it);
+                ItemStack dye = new ItemStack(Material.LIGHT_GRAY_DYE);
+                ItemMeta meta = dye.getItemMeta();
+                meta.setDisplayName("§f§4§lТут може бути ваше сердечко <3");
+                meta.setCustomModelData(1717);
+                dye.setItemMeta(meta);
+                if (!nb.getBoolean("is_heart") || Integer.parseInt(args[0]) == 0 || Integer.parseInt(args[0]) > 9) {
+                    sender.sendMessage("У вказаному слоті не має серця!");
+                    return false;
+                }
+
+                p.getInventory().setItem(8+Integer.parseInt(args[0]), dye);
+                p.getInventory().addItem(it);
+                return true;
+            }
+        });
+        getCommand("give_heart").setExecutor(new CommandExecutor() {
+
+            @Override
+            public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+                if (args.length == 0) {
+                    sender.sendMessage("/give_heart <тип серця>");
+                    return false;
+                }
+                DefaultItem nt = null;
+                if (Objects.equals(args[0], "lapis")) {
+                    nt = new LapisHeart();
+                }
+                if (nt == null) {
+                    sender.sendMessage("Невідомий тип серця, ви можете видати собі наступні серця: \nЛазуритове");
+                    return false;
+                }
+//                if (sender instanceof Player) {
+//
+//                }
+                Bukkit.getPlayer(sender.getName()).getInventory().addItem(nt.selfeee());
+                sender.sendMessage("Успішно видано серце " + args[0]);
+                return true;
+            }
+        });
     }
 
     @Override

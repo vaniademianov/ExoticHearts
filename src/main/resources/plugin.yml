@@ -3,6 +3,7 @@ version: '${project.version}'
 main: net.remote.access.exohearts.ExoHearts
 api-version: 1.19
 prefix:  EH
+depend: [NBTAPI]
 load: STARTUP
 authors: [ RemoteAccess ]
 description: Плагін зроблений спеціально для ExoticCraft RemoteAccess01
@@ -10,3 +11,9 @@ website: exoticcraft.fun
 commands:
   vers:
     description: Версія плагіну
+  give_heart:
+    description: give_heart <тип серця> Видати серце
+  equip:
+    description: Екіпірувати серце в руці
+  unequip:
+    description: unequip <номер> Розекіпірувати серце
