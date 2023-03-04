@@ -1,10 +1,16 @@
 package net.remote.access.exohearts;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import de.tr7zw.nbtapi.NBTItem;
+import me.darkolythe.customrecipeapi.CustomRecipeAPI;
 import net.remote.access.exohearts.items.DefaultItem;
 import net.remote.access.exohearts.items.LapisHeart;
+import net.remote.access.exohearts.items.RedstoneHeart;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,11 +19,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
-
+//import com.onarandombox.MultiverseCore.api.
+import java.util.Collection;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import static org.bukkit.Material.AIR;
+
 //Лазуритове Серце
 //        В 1.5 Більше досвіду
 //        Удача 1 Нескінченна
@@ -51,12 +64,15 @@ import java.util.logging.Logger;
 //        шанс 1/6 накласти ефект візерів на противника
 //        6 зірок незеру  32 Кістки
 public final class ExoHearts extends JavaPlugin {
+    private Utils u = new Utils();
+
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         Logger l = Bukkit.getLogger();
         l.info("[EH] Here I am!");
+
         getCommand("vers").setExecutor(new CommandExecutor() {
             @Override
             public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -81,6 +97,12 @@ public final class ExoHearts extends JavaPlugin {
                         if (!nbt.getBoolean("is_heart") && hand.getBoolean("is_heart")) {
                             p.getInventory().setItem(i, p.getItemInHand());
                             p.getInventory().setItemInHand(new ItemStack(Material.AIR));
+                            if (u.hearts_equepied(p) == 1) {
+                                p.setMaxHealth(p.getMaxHealth()+20);
+                            }
+                            else {
+                                p.setMaxHealth(p.getMaxHealth()+4);
+                            }
                             return true;
                         }
                     }
@@ -92,7 +114,7 @@ public final class ExoHearts extends JavaPlugin {
         getCommand("texturepack").setExecutor(new CommandExecutor() {
             @Override
             public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                Bukkit.getPlayer(sender.getName()).setTexturePack("https://www.dropbox.com/s/9qv9im0893vzl93/exoticpack3.zip?dl=1");
+                Bukkit.getPlayer(sender.getName()).setTexturePack("https://www.dropbox.com/s/k3hei7c3dlru32f/exoticpack.4.zip?dl=1");
                 return true;
             }
         });
@@ -111,6 +133,10 @@ public final class ExoHearts extends JavaPlugin {
                 meta.setDisplayName("§f§4§lТут може бути ваше сердечко <3");
                 meta.setCustomModelData(1717);
                 dye.setItemMeta(meta);
+                NBTItem it_nbt = new NBTItem(dye);
+                it_nbt.setString("heart_type", "null_heart");
+
+                dye = it_nbt.getItem();
                 if (!nb.getBoolean("is_heart") || Integer.parseInt(args[0]) == 0 || Integer.parseInt(args[0]) > 9) {
                     sender.sendMessage("У вказаному слоті не має серця!");
                     return false;
@@ -118,6 +144,12 @@ public final class ExoHearts extends JavaPlugin {
 
                 p.getInventory().setItem(8+Integer.parseInt(args[0]), dye);
                 p.getInventory().addItem(it);
+                if (u.hearts_equepied(p) == 0) {
+                    p.setMaxHealth(p.getMaxHealth()-20);
+                }
+                else {
+                    p.setMaxHealth(p.getMaxHealth()-4);
+                }
                 return true;
             }
         });
@@ -133,8 +165,11 @@ public final class ExoHearts extends JavaPlugin {
                 if (Objects.equals(args[0], "lapis")) {
                     nt = new LapisHeart();
                 }
+                if (Objects.equals(args[0], "redstone")) {
+                    nt = new RedstoneHeart();
+                }
                 if (nt == null) {
-                    sender.sendMessage("Невідомий тип серця, ви можете видати собі наступні серця: \nЛазуритове");
+                    sender.sendMessage("Невідомий тип серця, ви можете видати собі наступні серця: \n\tЛазуритове (lapis) \n\tРедстоунове (redstone)");
                     return false;
                 }
 //                if (sender instanceof Player) {
@@ -145,10 +180,42 @@ public final class ExoHearts extends JavaPlugin {
                 return true;
             }
         });
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+
+                Collection<? extends Player> online_p = Bukkit.getOnlinePlayers();
+                PotionEffect potion_l = new PotionEffect(PotionEffectType.SPEED, 20*3, 1);
+                PotionEffect potion_r = new PotionEffect(PotionEffectType.FAST_DIGGING, 20*3, 2);
+                for (Player p : online_p) {
+                    if (u.isEquipped("lapis",p)) {
+
+
+                        p.addPotionEffect(potion_l);
+
+
+                    }
+                    if (u.isEquipped("redstone",p)) {
+
+
+                        p.addPotionEffect(potion_r);
+
+
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0L, 20L*3);
     }
 
     @Override
     public void onDisable() {
+        Logger l = Bukkit.getLogger();
+        l.info("[EH] Bye!");
+        MultiverseCore core = (MultiverseCore) Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core");
+        MVWorldManager worldManager = core.getMVWorldManager();
+        worldManager.unloadWorld("structures");
         // Plugin shutdown logic
     }
 }
