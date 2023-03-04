@@ -76,7 +76,7 @@ public final class ExoHearts extends JavaPlugin {
         getCommand("vers").setExecutor(new CommandExecutor() {
             @Override
             public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                sender.sendMessage("Версія плагіну: 0.0.4 DEV BUILD");
+                sender.sendMessage("Версія плагіну: 0.0.8 DEV BUILD");
                 return true;
             }
         });

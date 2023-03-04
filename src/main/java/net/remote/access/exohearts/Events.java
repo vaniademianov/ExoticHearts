@@ -58,7 +58,7 @@ public class Events implements Listener {
     public void OnBlockBreak(BlockBreakEvent e) {
         ItemStack is;
         if (u.isEquipped("redstone", e.getPlayer())) {
-            if (e.getBlock().getType() == REDSTONE_ORE) {
+            if (e.getBlock().getType() == REDSTONE_ORE || e.getBlock().getType() == DEEPSLATE_REDSTONE_ORE) {
                 Collection<ItemStack> cl = e.getBlock().getDrops(e.getPlayer().getItemInHand());
 
                 for (ItemStack a : cl) {
